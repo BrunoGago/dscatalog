@@ -3,11 +3,26 @@ package com.devsuperior.dscatalog.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+//6 - Anotação JPA: Usada para manipular ORM (Mapeamento de Objeto Relacional) no banco de dados (Nesse caso o H2)
+//6.1 - Essa anotação informa ao banco que está classe é uma entidade de negócio
+//7 - Table: Gera uma script SQL CREATE TABLE (passamos o nome como parâmetro)
+@Entity
+@Table(name = "tb_category")
 public class Category implements Serializable{
 
 	//2- Padrão Java para que o objeto possa ser convertido em bytes e ser passado para arquivos e redes. É uma boa práticae
 	private static final long serialVersionUID = 1L;
 	
+	//8 - Anotação JPA de ID para o Banco de Dados
+	//9 - GeneratedValue: Anotação JPA para que o ID seja auto incrementado pelo próprio banco de dados de 1 em 1;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	
