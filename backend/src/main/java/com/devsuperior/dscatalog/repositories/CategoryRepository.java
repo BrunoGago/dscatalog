@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.devsuperior.dscatalog.entities.Category;
 
 /*10 - Repository: É a camada de acesso a dados, implementando uma JpaRepository, criando uma interface para a classe Category (os métodos valem
- * para qualquer BD Relacional
+ * para qualquer BD Relacional)
  * */
 //14 - Repository: Anotação JPA para que a interface possa ser "injetada" posteriormente
 @Repository
