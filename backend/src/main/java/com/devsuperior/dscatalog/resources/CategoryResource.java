@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.devsuperior.dscatalog.entities.Category;
+import com.devsuperior.dscatalog.dto.CategoryDTO;
 import com.devsuperior.dscatalog.services.CategoryService;
 
 //4 - Para implementação da classe controller, devemos usar uma anotação Spring (RestController)
@@ -28,10 +28,10 @@ public class CategoryResource {
 	//ResponseEntity: É um objeto do spring que vai encapsular uma resposta HTTP
 	//GetMapping: é uma anotação composta que funciona como um atalho para @RequestMapping(method = RequestMethod.GET)
 	@GetMapping
-	public ResponseEntity<List<Category>> findAll(){
+	public ResponseEntity<List<CategoryDTO>> findAll(){
 		
 		//15 - Variável criada para trazer todos os dados de service, que por sua vez traz os dados do Banco de Dados
-		List<Category> list = service.findAll();
+		List<CategoryDTO> list = service.findAll();
 		
 		//ResponseEntity.ok: permite uma resposta HTTP 200 (requisição com sucesso); O body()é o valor que será retornado, nesse caso, a lista
 		return ResponseEntity.ok().body(list);
