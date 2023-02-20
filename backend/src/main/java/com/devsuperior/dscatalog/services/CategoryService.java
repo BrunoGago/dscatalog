@@ -81,6 +81,5 @@ public class CategoryService {
 		catch(DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity violation, please ensure to delete a valid item!");
 		}
-		
 	}
 }
