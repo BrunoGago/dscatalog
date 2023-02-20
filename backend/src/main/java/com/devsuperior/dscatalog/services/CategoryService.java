@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devsuperior.dscatalog.dto.CategoryDTO;
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
-import com.devsuperior.dscatalog.services.exceptions.EntityNotFoundException;
+import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
+
+import jakarta.persistence.EntityNotFoundException;
 
 //11 - Service: Anotação JPA que registrar a classe como um componente de injeção de dependência automatizado do Spring
 //quem vai gerenciar as instâncias do CategoryService vai ser o spring
@@ -38,7 +40,7 @@ public class CategoryService {
 	@Transactional(readOnly = true)
 	public CategoryDTO findById(Long id) {
 		Optional<Category> obj = repository.findById(id);
-		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity not found!"));
+		Category entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found!"));
 		return new CategoryDTO(entity);
 	}
 
@@ -49,5 +51,19 @@ public class CategoryService {
 		entity.setName(dto.getName());
 		entity = repository.save(entity);
 		return new CategoryDTO(entity);
+	}
+
+	//getReferenceById: Garante que o objeto seja instanciado em memória antes de acionar o BD
+	@Transactional
+	public CategoryDTO update(Long id, CategoryDTO dto) {
+		try{
+			Category entity = repository.getReferenceById(id);
+			entity.setName(dto.getName());
+			entity = repository.save(entity);
+			return new CategoryDTO(entity);
+		}
+		catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException("ID (" + id + ") NOT FOUND!");
+		}
 	}
 }
