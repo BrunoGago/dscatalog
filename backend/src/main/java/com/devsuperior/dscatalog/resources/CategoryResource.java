@@ -4,9 +4,11 @@
 package com.devsuperior.dscatalog.resources;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -34,11 +37,19 @@ public class CategoryResource {
 	//End-point: É a primeira rota possível que irá responder algo (salvar, deletar, etc - dentro da rota que setamos em RequestMapping)
 	//ResponseEntity: É um objeto do spring que vai encapsular uma resposta HTTP
 	//GetMapping: é uma anotação composta que funciona como um atalho para @RequestMapping(method = RequestMethod.GET)
+	//RequestParam: Utilizado para setar um parâmetro não obrigatório que pode ser usado para paginação dos resultados
 	@GetMapping
-	public ResponseEntity<List<CategoryDTO>> findAll(){
+	public ResponseEntity<Page<CategoryDTO>> findAll(
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
+			@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
+			@RequestParam(value = "direction", defaultValue = "ASC") String direction,
+			@RequestParam(value = "orderBy", defaultValue = "name") String orderBy
+			){
+		
+		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
 		
 		//15 - Variável criada para trazer todos os dados de service, que por sua vez traz os dados do Banco de Dados
-		List<CategoryDTO> list = service.findAll();
+		Page<CategoryDTO> list = service.findAllPaged(pageRequest);
 		
 		//ResponseEntity.ok: permite uma resposta HTTP 200 (requisição com sucesso); O body()é o valor que será retornado, nesse caso, a lista
 		return ResponseEntity.ok().body(list);	

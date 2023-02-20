@@ -1,12 +1,12 @@
 package com.devsuperior.dscatalog.services;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,12 +31,12 @@ public class CategoryService {
 	//Transactional: Anotação spring, o framework garante que a transação será feita no BD.
 	//readOnly: Ao setarmos como true, evita que seja feito o looking no banco de dados so para leitura, melhorando a performance.
 	@Transactional(readOnly = true)
-	public List<CategoryDTO> findAll(){
+	public Page<CategoryDTO> findAllPaged(PageRequest pageRequest){
 		
-		List<Category> list =  repository.findAll();
+		Page<Category> list = repository.findAll(pageRequest);
 		
 		//Utilizei a função lambda para transformar os dados da lista de Category para um dado de CategoryDTO
-		return list.stream().map(x -> new CategoryDTO(x)).collect(Collectors.toList());
+		return list.map(x -> new CategoryDTO(x));
 	}
 
 	//Optional: Utilizado para evitar trabalharmos com valor nulo (desde o Java 8)
