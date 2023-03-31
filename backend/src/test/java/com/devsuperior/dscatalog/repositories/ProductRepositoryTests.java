@@ -12,6 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import java.util.Optional;
 
 //DataJpaTest: Usado para receber somente as informações do repositório JPA para realizar os testes
+
 @DataJpaTest
 public class ProductRepositoryTests {
 
