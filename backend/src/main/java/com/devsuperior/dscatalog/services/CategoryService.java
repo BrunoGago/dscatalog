@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +32,9 @@ public class CategoryService {
 	//Transactional: Anotação spring, o framework garante que a transação será feita no BD.
 	//readOnly: Ao setarmos como true, evita que seja feito o looking no banco de dados so para leitura, melhorando a performance.
 	@Transactional(readOnly = true)
-	public Page<CategoryDTO> findAllPaged(PageRequest pageRequest){
+	public Page<CategoryDTO> findAllPaged(Pageable pageable){
 		
-		Page<Category> list = repository.findAll(pageRequest);
+		Page<Category> list = repository.findAll(pageable);
 		
 		//Utilizei a função lambda para transformar os dados da lista de Category para um dado de CategoryDTO
 		return list.map(x -> new CategoryDTO(x));
