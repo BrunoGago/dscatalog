@@ -1,11 +1,15 @@
 package com.devsuperior.dscatalog.services;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
+import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
+import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dscatalog.tests.Factory;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,9 +41,12 @@ public class ProductServiceTests {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private CategoryRepository categoryRepository;
+
     //Usado quando a classe de teste carrega o CONTEXTO e precisa MOCKAR um BEAN (@WebMvcTest e @SprinBootTest)
-    @MockBean
-    private ProductRepository productRepository2;
+    //@MockBean
+    //private ProductRepository productRepository2;
 
     private long existingId;
     private long nonExistId;
@@ -50,6 +57,10 @@ public class ProductServiceTests {
 
     private Product product;
 
+    private Category category;
+
+    private ProductDTO productDTO;
+
     //BeforeEach é usado para configuração, inicialização de uma variável universal nos testes, etc
     @BeforeEach
     void setUp() throws Exception {
@@ -58,9 +69,11 @@ public class ProductServiceTests {
         dependentId = 4L;
         product = Factory.creatProduct();
         page = new PageImpl<>(List.of(product));
+        category = Factory.createCategory();
+        productDTO = Factory.createProductDto();
 
         //configuração para findAll que retorna uma Page
-        //como o método findAll retorna vários tipode de dados, temos que fazer um casting de ArgumentMatchers para Pageable
+        //como o método findAll retorna vários tipos de de dados, temos que fazer um casting de ArgumentMatchers para Pageable
         Mockito.when(productRepository.findAll((Pageable) ArgumentMatchers.any())).thenReturn(page);
 
         //Configuração de Save para teste mock
@@ -81,6 +94,18 @@ public class ProductServiceTests {
 
         //Configuração de comportamento simulado para lançar exceção quando o delete do banco tiver integridade violada (deletar PK sem deletar FK)
         Mockito.doThrow(DataIntegrityViolationException.class).when(productRepository).deleteById(dependentId);
+
+        //Configuração de comportamento simulado do GetOne quando o ID existir, retornando o product
+        Mockito.when(productRepository.getOne(existingId)).thenReturn(product);
+
+        //Configuração de comportamento simulado do GetOne quando o ID não existir, retornando uma exceção
+        Mockito.when(productRepository.getOne(nonExistId)).thenThrow(EntityNotFoundException.class);
+
+        //Configuração de comportamento simulado do GetOne quando o ID existir, retornando o product
+        Mockito.when(categoryRepository.getOne(existingId)).thenReturn(category);
+
+        //Configuração de comportamento simulado do GetOne quando o ID não existir, retornando uma exceção
+        Mockito.when(categoryRepository.getOne(nonExistId)).thenThrow(EntityNotFoundException.class);
     }
 
     @Test
@@ -120,4 +145,38 @@ public class ProductServiceTests {
         //Podemos usar Mockito. para acessar diversos métodos da infertace
         Mockito.verify(productRepository).deleteById(existingId);
     }
+
+
+    @Test
+    public void findByIdShouldReturnProductDtoWhenIdExists(){
+        ProductDTO result = productService.findById(existingId);
+
+        Assertions.assertTrue(existingId == result.getId());
+    }
+
+    @Test
+    public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists(){
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            productService.findById(nonExistId);
+        });
+
+        //Vai verificar se o método "findById" foi chamado pelo Mock de productoRepository
+        Mockito.verify(productRepository, Mockito.times(1)).findById(nonExistId);
+    }
+
+    @Test
+    public void updateShouldReturnProductDtoWhenIdExist(){
+        //Update pede um Long Id e um ProductDto
+        ProductDTO result = productService.update(existingId, productDTO);
+
+        Assertions.assertNotNull(result);
+    }
+
+    @Test
+    public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists(){
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            productService.update(nonExistId, productDTO);
+        });
+    }
+
 }
